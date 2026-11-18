@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: go-demo-multicontainer
+  namespace: default
+  labels:
+    app: go-demo-multicontainer
+spec:
+  restartPolicy: Always
+  containers:
+    - name: app
+      image: ghcr.io/den-vasyliev/go-demo-app:latest
+      ports:
+        - name: http
+          containerPort: 8080
+      volumeMounts:
+        - name: shared-logs
+          mountPath: /var/log/app
+    - name: log-reader
+      image: busybox:1.36
+      command:
+        - sh
+        - -c
+        - while true; do cat /var/log/app/app.log 2>/dev/null; sleep 30; done
+      volumeMounts:
+        - name: shared-logs
+          mountPath: /var/log/app
+  volumes:
+    - name: shared-logs
+      emptyDir: {}

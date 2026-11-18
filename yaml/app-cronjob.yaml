@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: go-demo-cleanup
+  namespace: default
+spec:
+  schedule: "30 2 * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 300
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: go-demo-cleanup
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: cleanup
+              image: ghcr.io/den-vasyliev/go-demo-app:latest
+              command: ["/app/go-demo-app", "cleanup"]

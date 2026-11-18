@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: go-demo-cleanup-once
+  namespace: default
+  labels:
+    app: go-demo-cleanup
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        app: go-demo-cleanup
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: cleanup
+          image: ghcr.io/den-vasyliev/go-demo-app:latest
+          command: ["/app/go-demo-app", "cleanup"]
